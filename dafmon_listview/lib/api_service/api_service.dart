@@ -27,6 +27,47 @@ class ApiService {
     }
   }
 
+  Future<void> updateStudent(int id, Map<String, dynamic> data) async {
+    final url = Uri.parse(
+        '$baseUrl/updateUser/$id'); // Assuming the API endpoint for updating a student is /updateUser/{id}
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(data),
+      );
+
+      if (response.statusCode == 200) {
+        print('Student updated successfully: ${response.body}');
+      } else {
+        print('Failed to update student: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> deleteStudent(int id) async {
+    final url = Uri.parse(
+        '$baseUrl/deleteUser/$id'); // Assuming the API endpoint for deleting a student is /deleteUser/{id}
+    try {
+      final response = await http.delete(
+        url,
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        print('Student deleted successfully: ${response.body}');
+      } else {
+        print('Failed to delete student: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   Future<List<StudentModel>> fetchStudentsYear(String year) async {
     final url = Uri.parse('$baseUrl/listUsers?year=$year');
     final response = await http.get(url);

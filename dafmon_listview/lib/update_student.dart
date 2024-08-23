@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_print
 
-import 'package:dafmon_listview/api_service/api_service.dart';
+import 'package:dafmon_listview/api_service/api_helper.dart';
 import 'package:dafmon_listview/model/student_model.dart';
 import 'package:dafmon_listview/widget/custom_switch.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
@@ -16,12 +16,12 @@ class UpdateStudentScreen extends StatefulWidget {
 }
 
 class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final _apiHelper = ApiHelper();
 
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _courseController = TextEditingController();
-
   String _selectedYear = 'First Year';
   final List<String> _years = [
     'First Year',
@@ -30,36 +30,16 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
     'Fourth Year',
     'Fifth Year'
   ];
-
   bool _enrolled = false;
 
-  void _submitForm() {
-    if (_formKey.currentState?.validate() ?? false) {
-      int year = _years.indexOf(_selectedYear) + 1;
-
-      final student = StudentModel(
-        firstName: _firstNameController.text,
-        lastName: _lastNameController.text,
-        course: _courseController.text,
-        year: year,
-        enrolled: _enrolled,
-      );
-
-      Map<String, dynamic> data = {
-        'firstName': student.firstName,
-        'lastName': student.lastName,
-        'course': student.course,
-        'year': student.year,
-        'enrolled': student.enrolled ? 1 : 0, // Convert boolean to 1/0
-      };
-
-      ApiService().sendData(data).then((_) {
-        Navigator.pop(context);
-      }).catchError((error) {
-        print('Failed: $error');
-        Navigator.pop(context);
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    _firstNameController.text = widget.student.firstName;
+    _lastNameController.text = widget.student.lastName;
+    _courseController.text = widget.student.course;
+    _selectedYear = _years[widget.student.year - 1];
+    _enrolled = widget.student.enrolled;
   }
 
   @override
@@ -162,7 +142,19 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8.0), // Add padding between buttons
                       child: ElevatedButton(
-                        onPressed: _submitForm,
+                        onPressed: () {
+                          _apiHelper.updateRecord(
+                            student: widget.student,
+                            formKey: _formKey,
+                            firstNameController: _firstNameController,
+                            lastNameController: _lastNameController,
+                            courseController: _courseController,
+                            selectedYear: _selectedYear,
+                            years: _years,
+                            enrolled: _enrolled,
+                            context: context,
+                          );
+                        },
                         child: const Text(
                           'Update Record',
                           style: TextStyle(color: Colors.black),
@@ -173,7 +165,12 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8.0), // Add padding between buttons
                       child: ElevatedButton(
-                        onPressed: _submitForm,
+                        onPressed: () {
+                          _apiHelper.deleteStudent(
+                            studentId: widget.student.id!,
+                            context: context,
+                          );
+                        },
                         child: const Text(
                           'Delete Record',
                           style: TextStyle(color: Colors.black),

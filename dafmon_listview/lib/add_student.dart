@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:dafmon_listview/api_service/api_helper.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
 import 'package:dafmon_listview/widget/custom_switch.dart';
@@ -14,6 +12,7 @@ class AddStudentScreen extends StatefulWidget {
 
 class _AddStudentScreenState extends State<AddStudentScreen> {
   final _formKey = GlobalKey<FormState>();
+  final ApiHelper _apiHelper = ApiHelper();
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -120,7 +119,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () => submitForm(
+                onPressed: () => _apiHelper.insertData(
                   formKey: _formKey,
                   firstNameController: _firstNameController,
                   lastNameController: _lastNameController,
@@ -130,8 +129,10 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                   enrolled: _enrolled,
                   context: context,
                 ),
-                child: const Text('Add Student',
-                    style: TextStyle(color: Colors.black)),
+                child: const Text(
+                  'Add Student',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ],
           ),

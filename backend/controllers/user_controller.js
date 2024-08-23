@@ -30,7 +30,7 @@ exports.createUser = (req, res) => {
 };
 
 //List all users
-exports.getAllUsers = (req, res) => {
+exports.getYearUsers = (req, res) => {
   const year = req.query.year;
   if (!year) {
     return res.status(400).json({ error: 'Year query parameter is required' });
@@ -56,6 +56,23 @@ exports.getAllUsers = (req, res) => {
   });
 };
 
+exports.getAllUsers = (req, res) => {
+  pool.getConnection((error, connection) => {
+    if (error) {
+      console.error('Database connection error:', error);
+      return res.status(500).json({ error: 'Database connection error' });
+    }
+    console.log(`Connected as id ${connection.threadId}`);
+    connection.query('SELECT * FROM students', (error, rows) => {
+      connection.release();
+      if (error) {
+        console.error('Query error:', error);
+        return res.status(500).json({ error: 'Query error' });
+      }
+      res.status(200).json(rows);
+    });
+  });
+};
 
 
 //Get specific user
@@ -91,9 +108,7 @@ exports.updateUser = (req, res) => {
           console.error('Error getting connection:', error);
           return res.status(500).json({ message: 'Error connecting to the database' });
       }
-      
       console.log(`Connected as id ${connection.threadId}`);
-
       const id = req.params.id;
       const params = req.body;  
 
@@ -103,6 +118,7 @@ exports.updateUser = (req, res) => {
       if (!id) {
           connection.release();
           return res.status(400).json({ message: 'School ID is required as a URL parameter' });
+          
       }
       connection.query('UPDATE students SET ? WHERE id = ?', [params, id], (error, results) => {
           connection.release();
