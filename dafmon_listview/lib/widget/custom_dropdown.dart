@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-class YearDropdown extends StatelessWidget {
+class CustomDropdown extends StatelessWidget {
   final String selectedYear;
   final List<String> years;
   final ValueChanged<String?> onChanged;
 
-  const YearDropdown({
-    Key? key,
+  const CustomDropdown({
+    super.key,
     required this.selectedYear,
     required this.years,
     required this.onChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

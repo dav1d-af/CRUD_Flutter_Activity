@@ -15,7 +15,7 @@ class Mainview extends StatefulWidget {
 
 class _Mainviewstate extends State<Mainview> {
   late Future<List<StudentModel>> futureStudents;
-  String selectedYear = 'First Year';
+  String selectedYear = 'No Year Filter';
   final Map<String, int> yearMapping = {
     'First Year': 1,
     'Second Year': 2,
@@ -25,6 +25,7 @@ class _Mainviewstate extends State<Mainview> {
   };
 
   final List<String> years = [
+    'No Year Filter',
     'First Year',
     'Second Year',
     'Third Year',
@@ -35,14 +36,18 @@ class _Mainviewstate extends State<Mainview> {
   @override
   void initState() {
     super.initState();
-    futureStudents =
-        ApiService().fetchStudents(yearMapping[selectedYear]!.toString());
+    futureStudents = ApiService()
+        .fetchStudentsYear(yearMapping[selectedYear]?.toString() ?? '');
   }
 
   void _updateStudents() {
     setState(() {
-      futureStudents =
-          ApiService().fetchStudents(yearMapping[selectedYear]!.toString());
+      if (selectedYear == 'No Year Filter') {
+        futureStudents = ApiService().fetchAllStudents();
+      } else {
+        futureStudents = ApiService()
+            .fetchStudentsYear(yearMapping[selectedYear]!.toString());
+      }
     });
   }
 
@@ -64,7 +69,7 @@ class _Mainviewstate extends State<Mainview> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: YearDropdown(
+                      child: CustomDropdown(
                         selectedYear: selectedYear,
                         years: years,
                         onChanged: (String? newValue) {

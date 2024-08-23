@@ -124,7 +124,7 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
                   child: Row(
                     children: [
                       Expanded(
-                        child: YearDropdown(
+                        child: CustomDropdown(
                           selectedYear: _selectedYear,
                           years: _years,
                           onChanged: (String? newValue) {

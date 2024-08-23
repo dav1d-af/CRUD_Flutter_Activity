@@ -27,7 +27,7 @@ class ApiService {
     }
   }
 
-  Future<List<StudentModel>> fetchStudents(String year) async {
+  Future<List<StudentModel>> fetchStudentsYear(String year) async {
     final url = Uri.parse('$baseUrl/listUsers?year=$year');
     final response = await http.get(url);
     if (response.statusCode == 200) {
@@ -35,6 +35,17 @@ class ApiService {
       return data.map((json) => StudentModel.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load students: ${response.reasonPhrase}');
+    }
+  }
+
+  Future<List<StudentModel>> fetchAllStudents() async {
+    final url = Uri.parse('$baseUrl/listAllUsers'); // No year parameter
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((json) => StudentModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load all students: ${response.reasonPhrase}');
     }
   }
 }
