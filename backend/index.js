@@ -1,8 +1,8 @@
-//imports
+// imports
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
-const userRoutes = require('./routes/user_routes'); 
+const userRoutes = require('./routes/user_routes');
 
 const app = express();
 
@@ -13,6 +13,6 @@ app.use(bodyParser.json());
 app.use('/api', userRoutes);
 
 const port = 3000;
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server is running on http://0.0.0.0:${port}`);
 });
