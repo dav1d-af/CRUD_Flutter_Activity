@@ -72,11 +72,9 @@ class ApiHelper {
 
       try {
         await ApiService().updateStudent(updatedStudent.id!, data);
-        Navigator.pop(context, true);
         return true;
       } catch (error) {
         print('Failed to update: $error');
-        Navigator.pop(context, false);
         return false;
       }
     }
@@ -89,10 +87,10 @@ class ApiHelper {
   }) async {
     try {
       await ApiService().deleteStudent(studentId);
-      return true; // Indicate success
+      return true;
     } catch (error) {
       print('Failed to delete student: $error');
-      return false; // Indicate failure
+      return false;
     }
   }
 }

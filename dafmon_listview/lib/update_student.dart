@@ -1,6 +1,9 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
 
 import 'package:dafmon_listview/api_service/api_helper.dart';
+import 'package:dafmon_listview/widget/custom_dropdown.dart';
+import 'package:dafmon_listview/widget/custom_switch.dart';
+import 'package:dafmon_listview/widget/custom_textfield.dart';
 import 'package:flutter/material.dart';
 import 'package:dafmon_listview/model/student_model.dart';
 
@@ -77,81 +80,141 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
           key: _formKey,
           child: Column(
             children: <Widget>[
-              TextFormField(
+              const SizedBox(height: 16),
+              CustomTextField(
                 controller: _firstNameController,
-                decoration: const InputDecoration(labelText: 'First Name'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a first name' : null,
+                labelText: 'First Name',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter your first name';
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
               ),
-              TextFormField(
+              const SizedBox(height: 16),
+              CustomTextField(
                 controller: _lastNameController,
-                decoration: const InputDecoration(labelText: 'Last Name'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a last name' : null,
+                labelText: 'Last Name',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter your last name';
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
               ),
-              TextFormField(
+              const SizedBox(height: 16),
+              CustomTextField(
                 controller: _courseController,
-                decoration: const InputDecoration(labelText: 'Course'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Please enter a course' : null,
-              ),
-              DropdownButtonFormField<String>(
-                value: _selectedYear,
-                items: _years.map((year) {
-                  return DropdownMenuItem(
-                    value: year,
-                    child: Text(year),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() => _selectedYear = value!),
-              ),
-              CheckboxListTile(
-                title: const Text('Enrolled'),
-                value: _enrolled,
-                onChanged: (value) => setState(() => _enrolled = value!),
-              ),
-              ElevatedButton(
-                onPressed: () async {
-                  bool result = await _apiHelper.updateRecord(
-                    student: widget.student,
-                    formKey: _formKey,
-                    firstNameController: _firstNameController,
-                    lastNameController: _lastNameController,
-                    courseController: _courseController,
-                    selectedYear: _selectedYear,
-                    years: _years,
-                    enrolled: _enrolled,
-                    context: context,
-                  );
-                  if (result) {
-                    widget.onUpdate(); // Notify Mainview
-                    Navigator.pop(context);
-                  } else {
-                    print('Failed to update student');
+                labelText: 'Course',
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Enter your course';
                   }
+                  return null;
                 },
-                child: const Text(
-                  'Update Record',
-                  style: TextStyle(color: Colors.black),
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () async {
-                  bool result = await _apiHelper.deleteStudent(
-                    studentId: widget.student.id!,
-                    context: context,
-                  );
-                  if (result) {
-                    widget.onUpdate();
-                    Navigator.pop(context);
-                  } else {
-                    print('Failed to delete student');
-                  }
-                },
-                child: const Text(
-                  'Delete Record',
-                  style: TextStyle(color: Colors.black),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: Card(
+                  color: Colors.white,
+                  elevation: 1,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: CustomDropdown(
+                          selectedYear: _selectedYear,
+                          years: _years,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedYear = newValue!;
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                child: CustomSwitch(
+                  value: _enrolled,
+                  onChanged: (bool value) {
+                    setState(() {
+                      _enrolled = value;
+                    });
+                  },
+                  title: 'Enrolled',
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Align buttons to the center
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        bool result = await _apiHelper.updateRecord(
+                          student: widget.student,
+                          formKey: _formKey,
+                          firstNameController: _firstNameController,
+                          lastNameController: _lastNameController,
+                          courseController: _courseController,
+                          selectedYear: _selectedYear,
+                          years: _years,
+                          enrolled: _enrolled,
+                          context: context,
+                        );
+                        if (result) {
+                          widget.onUpdate();
+                          Navigator.pop(context);
+                        } else {
+                          print('Failed to update student');
+                        }
+                      },
+                      child: const Text(
+                        'Update Record',
+                        style: TextStyle(color: Colors.black),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                      ),
+                      onPressed: () async {
+                        bool result = await _apiHelper.deleteStudent(
+                          studentId: widget.student.id!,
+                          context: context,
+                        );
+                        if (result) {
+                          widget.onUpdate();
+                          Navigator.pop(context);
+                        } else {
+                          print('Failed to delete student');
+                        }
+                      },
+                      child: const Text(
+                        'Delete Record',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

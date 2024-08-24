@@ -3,6 +3,7 @@
 import 'package:dafmon_listview/api_service/api_helper.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
 import 'package:dafmon_listview/widget/custom_switch.dart';
+import 'package:dafmon_listview/widget/custom_textfield.dart';
 import 'package:flutter/material.dart';
 
 class AddStudentScreen extends StatefulWidget {
@@ -43,46 +44,47 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
           key: _formKey,
           child: Column(
             children: [
-              TextFormField(
+              const SizedBox(height: 16),
+              CustomTextField(
                 controller: _firstNameController,
-                decoration: const InputDecoration(
-                  labelText: 'First Name',
-                  border: OutlineInputBorder(),
-                ),
+                labelText: 'First Name',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Enter your first name';
                   }
                   return null;
                 },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _lastNameController,
                 decoration: const InputDecoration(
-                  labelText: 'Last Name',
                   border: OutlineInputBorder(),
                 ),
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: _lastNameController,
+                labelText: 'Last Name',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Enter your last name';
                   }
                   return null;
                 },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _courseController,
                 decoration: const InputDecoration(
-                  labelText: 'Course',
                   border: OutlineInputBorder(),
                 ),
+              ),
+              const SizedBox(height: 16),
+              CustomTextField(
+                controller: _courseController,
+                labelText: 'Course',
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Enter your course';
                   }
                   return null;
                 },
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
               ),
               const SizedBox(height: 16),
               Padding(
