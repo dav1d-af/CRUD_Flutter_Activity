@@ -36,7 +36,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Student'),
+        title: const Text('Add Student'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -136,10 +136,8 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
                   );
 
                   if (result) {
-                    // Handle success (e.g., show a success message)
                     print('Student added successfully');
                   } else {
-                    // Handle failure (e.g., show an error message)
                     print('Failed to add student');
                   }
                 },

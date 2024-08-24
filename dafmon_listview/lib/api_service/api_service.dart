@@ -29,7 +29,7 @@ class ApiService {
 
   Future<void> updateStudent(int id, Map<String, dynamic> data) async {
     final url = Uri.parse(
-        '$baseUrl/updateUser/$id'); // Assuming the API endpoint for updating a student is /updateUser/{id}
+        '$baseUrl/updateUser/$id');
     try {
       final response = await http.put(
         url,
@@ -50,7 +50,7 @@ class ApiService {
 
   Future<void> deleteStudent(int id) async {
     final url = Uri.parse(
-        '$baseUrl/deleteUser/$id'); // Assuming the API endpoint for deleting a student is /deleteUser/{id}
+        '$baseUrl/deleteUser/$id');
     try {
       final response = await http.delete(
         url,
@@ -80,7 +80,7 @@ class ApiService {
   }
 
   Future<List<StudentModel>> fetchAllStudents() async {
-    final url = Uri.parse('$baseUrl/listAllUsers'); // No year parameter
+    final url = Uri.parse('$baseUrl/listAllUsers');
     final response = await http.get(url);
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);

@@ -160,7 +160,7 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment:
-                    MainAxisAlignment.center, // Align buttons to the center
+                    MainAxisAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),

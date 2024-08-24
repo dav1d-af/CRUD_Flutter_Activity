@@ -29,20 +29,20 @@ class ApiHelper {
         'lastName': student.lastName,
         'course': student.course,
         'year': student.year,
-        'enrolled': student.enrolled ? 1 : 0, // Convert boolean to 1/0
+        'enrolled': student.enrolled ? 1 : 0,
       };
 
       try {
         await ApiService().sendData(data);
-        return true; // Indicate success
+        return true;
       } catch (error) {
         print('Failed to send data: $error');
-        return false; // Indicate failure
+        return false; 
       } finally {
         Navigator.pop(context, true);
       }
     }
-    return false; // Form is not valid
+    return false;
   }
 
   Future<bool> updateRecord({
