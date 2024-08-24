@@ -1,6 +1,7 @@
 import 'package:dafmon_listview/add_student.dart';
 import 'package:dafmon_listview/api_service/api_service.dart';
 import 'package:dafmon_listview/model/student_model.dart';
+import 'package:dafmon_listview/update_student.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
 import 'package:dafmon_listview/widget/custom_floating_button.dart';
 import 'package:dafmon_listview/widget/custom_student_list.dart';
@@ -10,10 +11,10 @@ class Mainview extends StatefulWidget {
   const Mainview({super.key});
 
   @override
-  State createState() => _Mainviewstate();
+  State createState() => _MainviewState();
 }
 
-class _Mainviewstate extends State<Mainview> {
+class _MainviewState extends State<Mainview> {
   late Future<List<StudentModel>> futureStudents;
   String selectedYear = 'No Year Filter';
   final Map<String, int> yearMapping = {
@@ -36,8 +37,7 @@ class _Mainviewstate extends State<Mainview> {
   @override
   void initState() {
     super.initState();
-    futureStudents = ApiService()
-        .fetchStudentsYear(yearMapping[selectedYear]?.toString() ?? '');
+    futureStudents = ApiService().fetchAllStudents();
   }
 
   void _updateStudents() {
@@ -49,6 +49,18 @@ class _Mainviewstate extends State<Mainview> {
             .fetchStudentsYear(yearMapping[selectedYear]!.toString());
       }
     });
+  }
+
+  void _navigateToUpdateStudentScreen(StudentModel student) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UpdateStudentScreen(
+          student: student,
+          onUpdate: _updateStudents,
+        ),
+      ),
+    );
   }
 
   @override
@@ -86,16 +98,23 @@ class _Mainviewstate extends State<Mainview> {
             ),
           ),
           Expanded(
-            child: StudentList(futureStudents: futureStudents),
+            child: StudentList(
+              futureStudents: futureStudents,
+              onCardTap: _navigateToUpdateStudentScreen,
+            ),
           ),
         ],
       ),
       floatingActionButton: CustomFloatingActionButton(
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const AddStudentScreen()),
           );
+
+          if (result == true) {
+            _updateStudents(); 
+          }
         },
       ),
     );

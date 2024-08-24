@@ -1,11 +1,16 @@
-import 'package:dafmon_listview/widget/custom_student_card.dart';
 import 'package:flutter/material.dart';
 import 'package:dafmon_listview/model/student_model.dart';
+import 'package:dafmon_listview/widget/custom_student_card.dart';
 
 class StudentList extends StatelessWidget {
   final Future<List<StudentModel>> futureStudents;
+  final void Function(StudentModel) onCardTap; // Callback for card taps
 
-  const StudentList({super.key, required this.futureStudents});
+  const StudentList({
+    super.key,
+    required this.futureStudents,
+    required this.onCardTap, // Pass callback
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,28 +29,14 @@ class StudentList extends StatelessWidget {
             itemCount: students.length,
             itemBuilder: (context, index) {
               final student = students[index];
-              return StudentCard(student: student);
+              return StudentCard(
+                student: student,
+                onTap: onCardTap, // Use the callback
+              );
             },
           );
         }
       },
     );
-  }
-
-  String convertYear(int year) {
-    switch (year) {
-      case 1:
-        return 'First';
-      case 2:
-        return 'Second';
-      case 3:
-        return 'Third';
-      case 4:
-        return 'Fourth';
-      case 5:
-        return 'Fifth';
-      default:
-        return 'Unknown';
-    }
   }
 }

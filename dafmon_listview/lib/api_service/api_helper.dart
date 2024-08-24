@@ -1,11 +1,9 @@
-// lib/helpers/form_helpers.dart
-
 import 'package:dafmon_listview/api_service/api_service.dart';
 import 'package:dafmon_listview/model/student_model.dart';
 import 'package:flutter/material.dart';
 
 class ApiHelper {
-  void insertData({
+  Future<bool> insertData({
     required GlobalKey<FormState> formKey,
     required TextEditingController firstNameController,
     required TextEditingController lastNameController,
@@ -14,7 +12,7 @@ class ApiHelper {
     required List<String> years,
     required bool enrolled,
     required BuildContext context,
-  }) {
+  }) async {
     if (formKey.currentState?.validate() ?? false) {
       int year = years.indexOf(selectedYear) + 1;
 
@@ -34,16 +32,20 @@ class ApiHelper {
         'enrolled': student.enrolled ? 1 : 0, // Convert boolean to 1/0
       };
 
-      ApiService().sendData(data).then((_) {
-        Navigator.pop(context);
-      }).catchError((error) {
+      try {
+        await ApiService().sendData(data);
+        return true; // Indicate success
+      } catch (error) {
         print('Failed to send data: $error');
-        Navigator.pop(context);
-      });
+        return false; // Indicate failure
+      } finally {
+        Navigator.pop(context, true);
+      }
     }
+    return false; // Form is not valid
   }
 
-  void updateRecord({
+  Future<bool> updateRecord({
     required StudentModel student,
     required GlobalKey<FormState> formKey,
     required TextEditingController firstNameController,
@@ -53,12 +55,12 @@ class ApiHelper {
     required List<String> years,
     required bool enrolled,
     required BuildContext context,
-  }) {
+  }) async {
     if (formKey.currentState?.validate() ?? false) {
       int year = years.indexOf(selectedYear) + 1;
 
       final updatedStudent = StudentModel(
-        id: student.id, // Use the existing ID
+        id: student.id,
         firstName: firstNameController.text,
         lastName: lastNameController.text,
         course: courseController.text,
@@ -67,24 +69,30 @@ class ApiHelper {
       );
 
       Map<String, dynamic> data = updatedStudent.toJson();
-      ApiService().updateStudent(updatedStudent.id!, data).then((_) {
-        Navigator.pop(context);
-      }).catchError((error) {
+
+      try {
+        await ApiService().updateStudent(updatedStudent.id!, data);
+        Navigator.pop(context, true);
+        return true;
+      } catch (error) {
         print('Failed to update: $error');
-        Navigator.pop(context);
-      });
+        Navigator.pop(context, false);
+        return false;
+      }
     }
+    return false;
   }
 
-  void deleteStudent({
+  Future<bool> deleteStudent({
     required int studentId,
     required BuildContext context,
-  }) {
-    ApiService().deleteStudent(studentId).then((_) {
-      Navigator.pop(context);
-    }).catchError((error) {
-      print('Failed to delete: $error');
-      Navigator.pop(context);
-    });
+  }) async {
+    try {
+      await ApiService().deleteStudent(studentId);
+      return true; // Indicate success
+    } catch (error) {
+      print('Failed to delete student: $error');
+      return false; // Indicate failure
+    }
   }
 }

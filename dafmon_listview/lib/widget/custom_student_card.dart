@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:dafmon_listview/model/student_model.dart';
-import 'package:dafmon_listview/update_student.dart';
 
 class StudentCard extends StatelessWidget {
   final StudentModel student;
+  final void Function(StudentModel) onTap; // Add callback for card tap
 
-  const StudentCard({super.key, required this.student});
+  const StudentCard({
+    super.key,
+    required this.student,
+    required this.onTap, // Accept callback
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UpdateStudentScreen(student: student),
-          ),
-        );
-      },
+      onTap: () => onTap(student), // Use the callback
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         elevation: 5,
