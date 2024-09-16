@@ -75,32 +75,32 @@ exports.getAllUsers = (req, res) => {
 };
 
 
-//Get specific user
-exports.getUserProfile = (req, res) => {
-  pool.getConnection((error, connection) => {
-    if (error) {
-      console.error('Error getting MySQL connection:', error);
-      return res.status(500).json({ message: 'Server error occurred' });
-    }
+// //Get specific user
+// exports.getUserProfile = (req, res) => {
+//   pool.getConnection((error, connection) => {
+//     if (error) {
+//       console.error('Error getting MySQL connection:', error);
+//       return res.status(500).json({ message: 'Server error occurred' });
+//     }
 
-    console.log(`Connected as id ${connection.threadId}`);
+//     console.log(`Connected as id ${connection.threadId}`);
 
-    connection.query('SELECT * FROM students WHERE id = ?', [req.params.id], (error, rows) => {
-      connection.release();
+//     connection.query('SELECT * FROM students WHERE id = ?', [req.params.id], (error, rows) => {
+//       connection.release();
 
-      if (error) {
-        console.error('Error executing query:', error);
-        return res.status(500).json({ message: 'Server error occurred' });
-      }
+//       if (error) {
+//         console.error('Error executing query:', error);
+//         return res.status(500).json({ message: 'Server error occurred' });
+//       }
 
-      if (rows.length > 0) {
-        res.status(200).json(rows[0]);
-      } else {
-        res.status(404).json({ message: 'User not found' });
-      }
-    });
-  });
-};
+//       if (rows.length > 0) {
+//         res.status(200).json(rows[0]);
+//       } else {
+//         res.status(404).json({ message: 'User not found' });
+//       }
+//     });
+//   });
+// };
 
 exports.updateUser = (req, res) => {
   pool.getConnection((error, connection) => {
@@ -131,7 +131,7 @@ exports.updateUser = (req, res) => {
               return res.status(404).json({ message: `No record found with ID ${id}.` });
           }
           res.status(200).json({ 
-              message: `Record of ${[params.last_name, params.first_name, params.middle_name]} has been updated.` 
+              message: `Record of ${[params.lastName, params.firstName]} has been updated.` 
           });
       });
   });
