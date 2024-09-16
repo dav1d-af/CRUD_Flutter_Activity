@@ -1,10 +1,12 @@
 // ignore_for_file: avoid_print
 
-import 'package:dafmon_listview/api_service/api_helper.dart';
+import 'package:dafmon_listview/api_service/api_service.dart';
+import 'package:dafmon_listview/api_service/student_repository.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
 import 'package:dafmon_listview/widget/custom_switch.dart';
 import 'package:dafmon_listview/widget/custom_textfield.dart';
 import 'package:flutter/material.dart';
+import 'package:dafmon_listview/model/student_model.dart';
 
 class AddStudentScreen extends StatefulWidget {
   const AddStudentScreen({super.key});
@@ -15,7 +17,7 @@ class AddStudentScreen extends StatefulWidget {
 
 class _AddStudentScreenState extends State<AddStudentScreen> {
   final _formKey = GlobalKey<FormState>();
-  final ApiHelper _apiHelper = ApiHelper();
+  late StudentRepository _studentRepository;
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -31,6 +33,35 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   ];
 
   bool _enrolled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize StudentRepository with ApiService
+    _studentRepository = StudentRepository(apiService: ApiService());
+  }
+
+  Future<void> _addStudent() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      int year = _years.indexOf(_selectedYear) + 1;
+
+      final student = StudentModel(
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        course: _courseController.text,
+        year: year,
+        enrolled: _enrolled,
+      );
+
+      try {
+        await _studentRepository.addStudent(student);
+        print('Student added successfully');
+        Navigator.pop(context);
+      } catch (error) {
+        print('Failed to add student: $error');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -123,24 +154,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () async {
-                  bool result = await _apiHelper.insertData(
-                    formKey: _formKey,
-                    firstNameController: _firstNameController,
-                    lastNameController: _lastNameController,
-                    courseController: _courseController,
-                    selectedYear: _selectedYear,
-                    years: _years,
-                    enrolled: _enrolled,
-                    context: context,
-                  );
-
-                  if (result) {
-                    print('Student added successfully');
-                  } else {
-                    print('Failed to add student');
-                  }
-                },
+                onPressed: _addStudent,
                 child: const Text(
                   'Add Student',
                   style: TextStyle(color: Colors.black),

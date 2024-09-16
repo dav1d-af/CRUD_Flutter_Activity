@@ -4,12 +4,12 @@ import 'package:dafmon_listview/widget/custom_student_card.dart';
 
 class StudentList extends StatelessWidget {
   final Future<List<StudentModel>> futureStudents;
-  final void Function(StudentModel) onCardTap; // Callback for card taps
+  final void Function(StudentModel) onCardTap;
 
   const StudentList({
     super.key,
     required this.futureStudents,
-    required this.onCardTap, // Pass callback
+    required this.onCardTap,
   });
 
   @override

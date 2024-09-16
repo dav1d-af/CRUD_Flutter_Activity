@@ -3,18 +3,18 @@ import 'package:dafmon_listview/model/student_model.dart';
 
 class StudentCard extends StatelessWidget {
   final StudentModel student;
-  final void Function(StudentModel) onTap; // Add callback for card tap
+  final void Function(StudentModel) onTap;
 
   const StudentCard({
     super.key,
     required this.student,
-    required this.onTap, // Accept callback
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => onTap(student), // Use the callback
+      onTap: () => onTap(student),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         elevation: 5,

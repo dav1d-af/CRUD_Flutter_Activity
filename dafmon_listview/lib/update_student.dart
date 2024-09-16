@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
-
-import 'package:dafmon_listview/api_service/api_helper.dart';
+import 'package:dafmon_listview/api_service/api_service.dart';
+import 'package:dafmon_listview/api_service/student_repository.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
 import 'package:dafmon_listview/widget/custom_switch.dart';
 import 'package:dafmon_listview/widget/custom_textfield.dart';
@@ -18,7 +18,6 @@ class UpdateStudentScreen extends StatefulWidget {
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _UpdateStudentScreenState createState() => _UpdateStudentScreenState();
 }
 
@@ -37,13 +36,13 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
     'Fifth Year'
   ];
 
-  late ApiHelper _apiHelper;
+  late StudentRepository _studentRepository;
 
   @override
   void initState() {
-    1;
     super.initState();
-    _apiHelper = ApiHelper();
+    // Initialize StudentRepository with ApiService
+    _studentRepository = StudentRepository(apiService: ApiService());
     _firstNameController.text = widget.student.firstName;
     _lastNameController.text = widget.student.lastName;
     _courseController.text = widget.student.course;
@@ -65,6 +64,39 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
         return 'Fifth Year';
       default:
         return 'Unknown Year';
+    }
+  }
+
+  Future<void> _updateStudent() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      int year = _years.indexOf(_selectedYear) + 1;
+
+      final updatedStudent = StudentModel(
+        id: widget.student.id,
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        course: _courseController.text,
+        year: year,
+        enrolled: _enrolled,
+      );
+
+      try {
+        await _studentRepository.updateStudent(updatedStudent);
+        widget.onUpdate();
+        Navigator.pop(context);
+      } catch (error) {
+        print('Failed to update student: $error');
+      }
+    }
+  }
+
+  Future<void> _deleteStudent() async {
+    try {
+      await _studentRepository.deleteStudent(widget.student.id!);
+      widget.onUpdate();
+      Navigator.pop(context);
+    } catch (error) {
+      print('Failed to delete student: $error');
     }
   }
 
@@ -159,31 +191,12 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
               ),
               const SizedBox(height: 16),
               Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                     child: ElevatedButton(
-                      onPressed: () async {
-                        bool result = await _apiHelper.updateRecord(
-                          student: widget.student,
-                          formKey: _formKey,
-                          firstNameController: _firstNameController,
-                          lastNameController: _lastNameController,
-                          courseController: _courseController,
-                          selectedYear: _selectedYear,
-                          years: _years,
-                          enrolled: _enrolled,
-                          context: context,
-                        );
-                        if (result) {
-                          widget.onUpdate();
-                          Navigator.pop(context);
-                        } else {
-                          print('Failed to update student');
-                        }
-                      },
+                      onPressed: _updateStudent,
                       child: const Text(
                         'Update Record',
                         style: TextStyle(color: Colors.black),
@@ -196,18 +209,7 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                       ),
-                      onPressed: () async {
-                        bool result = await _apiHelper.deleteStudent(
-                          studentId: widget.student.id!,
-                          context: context,
-                        );
-                        if (result) {
-                          widget.onUpdate();
-                          Navigator.pop(context);
-                        } else {
-                          print('Failed to delete student');
-                        }
-                      },
+                      onPressed: _deleteStudent,
                       child: const Text(
                         'Delete Record',
                         style: TextStyle(color: Colors.white),

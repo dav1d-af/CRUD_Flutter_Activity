@@ -1,5 +1,6 @@
 import 'package:dafmon_listview/add_student.dart';
 import 'package:dafmon_listview/api_service/api_service.dart';
+import 'package:dafmon_listview/api_service/student_repository.dart';
 import 'package:dafmon_listview/model/student_model.dart';
 import 'package:dafmon_listview/update_student.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
@@ -34,21 +35,28 @@ class _MainviewState extends State<Mainview> {
     'Fifth Year'
   ];
 
+  late StudentRepository _studentRepository;
+
   @override
   void initState() {
     super.initState();
-    futureStudents = ApiService().fetchAllStudents();
+    _studentRepository = StudentRepository(apiService: ApiService());
+    _updateStudents(); // This will trigger an update to the student list.
   }
 
   void _updateStudents() {
-    setState(() {
-      if (selectedYear == 'No Year Filter') {
-        futureStudents = ApiService().fetchAllStudents();
-      } else {
-        futureStudents = ApiService()
-            .fetchStudentsYear(yearMapping[selectedYear]!.toString());
-      }
-    });
+    if (_studentRepository != null) { // Ensure the repository is initialized
+      setState(() {
+        if (selectedYear == 'No Year Filter') {
+          futureStudents = _studentRepository.getAllStudents();
+        } else {
+          futureStudents = _studentRepository.getStudentsByYear(yearMapping[selectedYear]!.toString());
+        }
+      });
+    } else {
+      // Handle the case where _studentRepository is not initialized
+      print('StudentRepository has not been initialized.');
+    }
   }
 
   void _navigateToUpdateStudentScreen(StudentModel student) {
@@ -113,7 +121,7 @@ class _MainviewState extends State<Mainview> {
           );
 
           if (result == true) {
-            _updateStudents(); 
+            _updateStudents();
           }
         },
       ),
