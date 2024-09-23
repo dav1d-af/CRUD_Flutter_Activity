@@ -1,6 +1,6 @@
 // ignore_for_file: avoid_print
 
-import 'package:dafmon_listview/api_service/api_service.dart';
+import 'package:dafmon_listview/api_service/student_repository_impl.dart';
 import 'package:dafmon_listview/api_service/student_repository.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
 import 'package:dafmon_listview/widget/custom_switch.dart';
@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:dafmon_listview/model/student_model.dart';
 
 class AddStudentScreen extends StatefulWidget {
-  const AddStudentScreen({super.key});
+  final VoidCallback onAdd;
+
+  const AddStudentScreen({super.key, required this.onAdd});
 
   @override
   State createState() => _AddStudentScreenState();
@@ -17,8 +19,7 @@ class AddStudentScreen extends StatefulWidget {
 
 class _AddStudentScreenState extends State<AddStudentScreen> {
   final _formKey = GlobalKey<FormState>();
-  late StudentRepository _studentRepository;
-
+  late StudentRepositoryImpl _studentRepositoryImpl;
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _courseController = TextEditingController();
@@ -37,8 +38,7 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize StudentRepository with ApiService
-    _studentRepository = StudentRepository(apiService: ApiService());
+    _studentRepositoryImpl = StudentRepositoryImpl();
   }
 
   Future<void> _addStudent() async {
@@ -54,8 +54,11 @@ class _AddStudentScreenState extends State<AddStudentScreen> {
       );
 
       try {
-        await _studentRepository.addStudent(student);
+        await _studentRepositoryImpl.addStudent(student);
         print('Student added successfully');
+        widget.onAdd();
+
+        // ignore: use_build_context_synchronously
         Navigator.pop(context);
       } catch (error) {
         print('Failed to add student: $error');

@@ -1,5 +1,5 @@
 import 'package:dafmon_listview/add_student.dart';
-import 'package:dafmon_listview/api_service/api_service.dart';
+import 'package:dafmon_listview/api_service/student_repository_impl.dart';
 import 'package:dafmon_listview/api_service/student_repository.dart';
 import 'package:dafmon_listview/model/student_model.dart';
 import 'package:dafmon_listview/update_student.dart';
@@ -35,22 +35,24 @@ class _MainviewState extends State<Mainview> {
     'Fifth Year'
   ];
 
-  late StudentRepository _studentRepository;
+  late StudentRepositoryImpl _studentRepositoryImpl;
 
   @override
   void initState() {
     super.initState();
-    _studentRepository = StudentRepository(apiService: ApiService());
-    _updateStudents(); // This will trigger an update to the student list.
+    _studentRepositoryImpl = StudentRepositoryImpl();
+    _updateStudents();
   }
 
   void _updateStudents() {
-    if (_studentRepository != null) { // Ensure the repository is initialized
+    if (_studentRepositoryImpl != null) {
+      // Ensure the repository is initialized
       setState(() {
         if (selectedYear == 'No Year Filter') {
-          futureStudents = _studentRepository.getAllStudents();
+          futureStudents = _studentRepositoryImpl.getAllStudents();
         } else {
-          futureStudents = _studentRepository.getStudentsByYear(yearMapping[selectedYear]!.toString());
+          futureStudents = _studentRepositoryImpl
+              .getStudentsByYear(yearMapping[selectedYear]!.toString());
         }
       });
     } else {
@@ -117,7 +119,10 @@ class _MainviewState extends State<Mainview> {
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const AddStudentScreen()),
+            MaterialPageRoute(
+                builder: (context) => AddStudentScreen(
+                      onAdd: _updateStudents,
+                    )),
           );
 
           if (result == true) {

@@ -1,6 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, avoid_print
-import 'package:dafmon_listview/api_service/api_service.dart';
 import 'package:dafmon_listview/api_service/student_repository.dart';
+import 'package:dafmon_listview/api_service/student_repository_impl.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
 import 'package:dafmon_listview/widget/custom_switch.dart';
 import 'package:dafmon_listview/widget/custom_textfield.dart';
@@ -18,6 +18,7 @@ class UpdateStudentScreen extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _UpdateStudentScreenState createState() => _UpdateStudentScreenState();
 }
 
@@ -36,13 +37,12 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
     'Fifth Year'
   ];
 
-  late StudentRepository _studentRepository;
+  late StudentRepositoryImpl _studentRepositoryImpl;
 
   @override
   void initState() {
     super.initState();
-    // Initialize StudentRepository with ApiService
-    _studentRepository = StudentRepository(apiService: ApiService());
+    _studentRepositoryImpl = StudentRepositoryImpl();
     _firstNameController.text = widget.student.firstName;
     _lastNameController.text = widget.student.lastName;
     _courseController.text = widget.student.course;
@@ -81,7 +81,11 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
       );
 
       try {
-        await _studentRepository.updateStudent(updatedStudent);
+        await _studentRepositoryImpl.updateStudent(
+          updatedStudent.id!, 
+          updatedStudent
+              .toJson(),
+        );
         widget.onUpdate();
         Navigator.pop(context);
       } catch (error) {
@@ -92,7 +96,7 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
 
   Future<void> _deleteStudent() async {
     try {
-      await _studentRepository.deleteStudent(widget.student.id!);
+      await _studentRepositoryImpl.deleteStudent(widget.student.id!);
       widget.onUpdate();
       Navigator.pop(context);
     } catch (error) {
