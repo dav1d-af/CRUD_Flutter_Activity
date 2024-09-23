@@ -1,6 +1,5 @@
 import 'package:dafmon_listview/add_student.dart';
 import 'package:dafmon_listview/api_service/student_repository_impl.dart';
-import 'package:dafmon_listview/api_service/student_repository.dart';
 import 'package:dafmon_listview/model/student_model.dart';
 import 'package:dafmon_listview/update_student.dart';
 import 'package:dafmon_listview/widget/custom_dropdown.dart';
@@ -45,21 +44,15 @@ class _MainviewState extends State<Mainview> {
   }
 
   void _updateStudents() {
-    if (_studentRepositoryImpl != null) {
-      // Ensure the repository is initialized
-      setState(() {
-        if (selectedYear == 'No Year Filter') {
-          futureStudents = _studentRepositoryImpl.getAllStudents();
-        } else {
-          futureStudents = _studentRepositoryImpl
-              .getStudentsByYear(yearMapping[selectedYear]!.toString());
-        }
-      });
-    } else {
-      // Handle the case where _studentRepository is not initialized
-      print('StudentRepository has not been initialized.');
+    setState(() {
+      if (selectedYear == 'No Year Filter') {
+        futureStudents = _studentRepositoryImpl.getAllStudents();
+      } else {
+        futureStudents = _studentRepositoryImpl
+            .getStudentsByYear(yearMapping[selectedYear]!.toString());
+      }
+    });
     }
-  }
 
   void _navigateToUpdateStudentScreen(StudentModel student) {
     Navigator.push(
