@@ -4,7 +4,8 @@ import 'package:dafmon_listview/model/student_model.dart';
 import 'package:http/http.dart' as http;
 
 class StudentRepositoryImpl implements StudentRepository {
-  final String baseUrl = 'http://localhost:3000/api';
+  // final String baseUrl = 'http://localhost:3000/api';
+  final String baseUrl = 'http://192.168.61.178:3000/api';
 
   @override
   Future<void> addStudent(StudentModel student) async {
@@ -47,6 +48,7 @@ class StudentRepositoryImpl implements StudentRepository {
   @override
   Future<List<StudentModel>> getAllStudents() async {
     final url = Uri.parse('$baseUrl/listAllUsers');
+    print('Requesting: $url'); // Debugging
 
     try {
       final response = await http.get(url);
