@@ -1,174 +1,85 @@
-const mysql = require('mysql');
-const pool = mysql.createPool({
-  connectionLimit: 10,
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'crud_activity'
-});
+const Student = require('../models/student_schema');
 
-
-//Create a user
-exports.createUser = (req, res) => {
-  pool.getConnection((error, connection) => {
-      if (error) throw error;
-      console.log(`connected as id ${connection.threadId}`);
-
-      const params = req.body;
-
-      connection.query('INSERT INTO students SET ?', params, (error, rows) => {
-          connection.release();
-
-          if (!error) {
-              res.status(200).json({ message: `Record of ${[params.lastName, params.firstName]} has been added.`});
-          } else {
-              console.log(error);
-              res.status(500).json({ message: error});
-          };
-      });
-  });
+// Create a user
+exports.createUser = async (req, res) => {
+  try {
+    const newStudent = new Student(req.body);
+    const savedStudent = await newStudent.save();
+    res.status(200).json({ message: `Record of ${savedStudent.firstName} ${savedStudent.lastName} has been added.`, data: savedStudent });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
-//List all users
-exports.getYearUsers = (req, res) => {
-  const year = req.query.year;
+// List all users for a specific year
+exports.getYearUsers = async (req, res) => {
+  const { year } = req.query;
   if (!year) {
     return res.status(400).json({ error: 'Year query parameter is required' });
   }
-  const validYears = ['1', '2', '3', '4', '5'];
-  if (!validYears.includes(year)) {
-    return res.status(400).json({ error: 'Invalid year parameter. Must be between 1 and 4.' });
+  const validYears = [1, 2, 3, 4, 5];
+  if (!validYears.includes(parseInt(year))) {
+    return res.status(400).json({ error: 'Invalid year parameter. Must be between 1 and 5.' });
   }
-  pool.getConnection((error, connection) => {
-    if (error) {
-      console.error('Database connection error:', error);
-      return res.status(500).json({ error: 'Database connection error' });
+  try {
+    const students = await Student.find({ year: parseInt(year) });
+    res.status(200).json(students);
+  } catch (error) {
+    console.error('Query error:', error);
+    res.status(500).json({ error: 'Database query error' });
+  }
+};
+
+// List all users
+exports.getAllUsers = async (req, res) => {
+  try {
+    const students = await Student.find();
+    res.status(200).json(students);
+  } catch (error) {
+    console.error('Query error:', error);
+    res.status(500).json({ error: 'Database query error' });
+  }
+};
+
+// Update a user by ID
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.params; 
+    const updatedData = req.body; 
+
+    const result = await Student.findByIdAndUpdate(id, updatedData, { new: true });
+
+    if (!result) {
+      return res.status(404).json({ error: 'Student not found' });
     }
-    console.log(`Connected as id ${connection.threadId}`);
-    connection.query('SELECT * FROM students WHERE year = ?', [year], (error, rows) => {
-      connection.release();
-      if (error) {
-        console.error('Query error:', error);
-        return res.status(500).json({ error: 'Query error' });
-      }
-      res.status(200).json(rows);
-    });
-  });
+
+    res.status(200).json({ message: 'Student updated successfully', data: result });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Database update error' });
+  }
 };
 
-exports.getAllUsers = (req, res) => {
-  pool.getConnection((error, connection) => {
-    if (error) {
-      console.error('Database connection error:', error);
-      return res.status(500).json({ error: 'Database connection error' });
+
+
+// Delete a user by ID
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    const result = await Student.findByIdAndDelete(id);
+    
+    if (!result) {
+      return res.status(404).json({ error: 'Student not found' });
     }
-    console.log(`Connected as id ${connection.threadId}`);
-    connection.query('SELECT * FROM students', (error, rows) => {
-      connection.release();
-      if (error) {
-        console.error('Query error:', error);
-        return res.status(500).json({ error: 'Query error' });
-      }
-      res.status(200).json(rows);
-    });
-  });
+
+    res.status(200).json({ message: 'Student deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Database delete error' });
+  }
 };
-
-
-// //Get specific user
-// exports.getUserProfile = (req, res) => {
-//   pool.getConnection((error, connection) => {
-//     if (error) {
-//       console.error('Error getting MySQL connection:', error);
-//       return res.status(500).json({ message: 'Server error occurred' });
-//     }
-
-//     console.log(`Connected as id ${connection.threadId}`);
-
-//     connection.query('SELECT * FROM students WHERE id = ?', [req.params.id], (error, rows) => {
-//       connection.release();
-
-//       if (error) {
-//         console.error('Error executing query:', error);
-//         return res.status(500).json({ message: 'Server error occurred' });
-//       }
-
-//       if (rows.length > 0) {
-//         res.status(200).json(rows[0]);
-//       } else {
-//         res.status(404).json({ message: 'User not found' });
-//       }
-//     });
-//   });
-// };
-
-exports.updateUser = (req, res) => {
-  pool.getConnection((error, connection) => {
-      if (error) {
-          console.error('Error getting connection:', error);
-          return res.status(500).json({ message: 'Error connecting to the database' });
-      }
-      console.log(`Connected as id ${connection.threadId}`);
-      const id = req.params.id;
-      const params = req.body;  
-
-      console.log('ID from params:', id);
-      console.log('Params from body:', params);
-
-      if (!id) {
-          connection.release();
-          return res.status(400).json({ message: 'School ID is required as a URL parameter' });
-          
-      }
-      connection.query('UPDATE students SET ? WHERE id = ?', [params, id], (error, results) => {
-          connection.release();
-          if (error) {
-              console.error('Error executing query:', error);
-              return res.status(500).json({ message: 'Database query error' });
-          }
-          console.log('Query Results:', results);
-          if (results.affectedRows === 0) {
-              return res.status(404).json({ message: `No record found with ID ${id}.` });
-          }
-          res.status(200).json({ 
-              message: `Record of ${[params.lastName, params.firstName]} has been updated.` 
-          });
-      });
-  });
-};
-
-//Delete a user
-exports.deleteUser = (req, res) => {
-  pool.getConnection((error, connection) => {
-      if (error) {
-          console.error('Error getting MySQL connection:', error);
-          return res.status(500).json({ message: 'Server error occurred' });
-      }
-      console.log(`Connected as id ${connection.threadId}`);
-
-      connection.query('DELETE FROM students WHERE id = ?', [req.params.id], (error, result) => {
-          connection.release(); 
-
-          if (error) {
-              console.error('Error executing query:', error);
-              return res.status(500).json({ message: 'Server error occurred' });
-          }
-
-          if (result.affectedRows > 0) {
-              res.status(200).json({ message: `Record with ID # ${req.params.id} has been deleted.` });
-          } else {
-              res.status(404).json({ message: 'User not found' });
-          }
-      });
-  });
-};
-
-
-
-
-
-
-
 
 
 

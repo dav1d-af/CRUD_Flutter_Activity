@@ -1,5 +1,5 @@
 class StudentModel {
-  final int? id;
+  final String? id; // Change to String
   final String firstName;
   final String lastName;
   final String course;
@@ -15,24 +15,27 @@ class StudentModel {
     required this.enrolled,
   });
 
-  factory StudentModel.fromJson(Map<String, dynamic> json) {
-    return StudentModel(
-      id: json['id'] as int?,
-      firstName: json['firstName'] as String,
-      lastName: json['lastName'] as String,
-      course: json['course'] as String,
-      year: json['year'] as int,
-      enrolled: json['enrolled'] == 1,
-    );
-  }
-
+  // Convert the StudentModel to JSON for sending to the API
   Map<String, dynamic> toJson() {
     return {
+      '_id': id, // Ensure this is included if needed
       'firstName': firstName,
       'lastName': lastName,
       'course': course,
       'year': year,
-      'enrolled': enrolled ? 1 : 0,
+      'enrolled': enrolled,
     };
+  }
+
+  // Add a factory constructor to create a StudentModel from JSON if needed
+  factory StudentModel.fromJson(Map<String, dynamic> json) {
+    return StudentModel(
+      id: json['_id'] as String?,
+      firstName: json['firstName'] as String,
+      lastName: json['lastName'] as String,
+      course: json['course'] as String,
+      year: json['year'] as int,
+      enrolled: json['enrolled'] as bool,
+    );
   }
 }

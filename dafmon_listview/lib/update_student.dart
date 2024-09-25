@@ -81,9 +81,8 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
 
       try {
         await _studentRepositoryImpl.updateStudent(
-          updatedStudent.id!, 
-          updatedStudent
-              .toJson(),
+          updatedStudent.id!,
+          updatedStudent.toJson(),
         );
         widget.onUpdate();
         Navigator.pop(context);
@@ -94,10 +93,15 @@ class _UpdateStudentScreenState extends State<UpdateStudentScreen> {
   }
 
   Future<void> _deleteStudent() async {
+    if (widget.student.id == null) {
+      print('Cannot delete student: Student ID is null.');
+      return;
+    }
+
     try {
       await _studentRepositoryImpl.deleteStudent(widget.student.id!);
       widget.onUpdate();
-      Navigator.pop(context);
+      Navigator.pop(context); 
     } catch (error) {
       print('Failed to delete student: $error');
     }

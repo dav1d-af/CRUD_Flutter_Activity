@@ -4,8 +4,8 @@ import 'package:dafmon_listview/model/student_model.dart';
 import 'package:http/http.dart' as http;
 
 class StudentRepositoryImpl implements StudentRepository {
-  // final String baseUrl = 'http://localhost:3000/api';
-  final String baseUrl = 'http://192.168.61.178:3000/api';
+  final String baseUrl = 'http://localhost:3000/api';
+  // final String baseUrl = 'http://192.168.61.178:3000/api';
 
   @override
   Future<void> addStudent(StudentModel student) async {
@@ -28,20 +28,18 @@ class StudentRepositoryImpl implements StudentRepository {
   }
 
   @override
-  Future<void> deleteStudent(int id) async {
-    final url = Uri.parse('$baseUrl/deleteUser/$id');
+  Future<void> deleteStudent(String id) async {
+    // Check if the ID is valid
+    if (id.isEmpty) {
+      throw Exception('Cannot delete student: Student ID is empty.');
+    }
 
-    try {
-      final response = await http.delete(
-        url,
-        headers: {'Content-Type': 'application/json'},
-      );
+    final url = Uri.parse(
+        '$baseUrl/deleteUser/$id'); // Assuming you have a base URL for your API
+    final response = await http.delete(url);
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to delete student: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete student: ${response.body}');
     }
   }
 
@@ -81,7 +79,7 @@ class StudentRepositoryImpl implements StudentRepository {
   }
 
   @override
-  Future<void> updateStudent(int id, Map<String, dynamic> data) async {
+  Future<void> updateStudent(String id, Map<String, dynamic> data) async {
     final url = Uri.parse('$baseUrl/updateUser/$id');
     try {
       final response = await http.put(
