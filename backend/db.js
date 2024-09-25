@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-const mongoURI = process.env.MONGODB_URI;
+const mongoURI = "mongodb+srv://general_user:ishkolarium2024@cluster0.hhmgu.mongodb.net/crud_activity?retryWrites=true&w=majority&appName=Cluster0";
 console.log("MongoDB URI:", mongoURI);
 
 
